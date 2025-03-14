@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InboxTales Review Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #0062cc, #0096ff);
+            color: white;
+            padding: 4rem 0;
+            margin-bottom: 2rem;
+        }
+        .review-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .services-list {
+            list-style: none;
+            padding: 0;
+        }
+        .services-list li {
+            margin-bottom: 0.5rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        .services-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #0096ff;
+        }
+        .generated-review {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+            display: none;
+        }
+        .loading {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero-section">
+        <div class="container">
+            <h1 class="display-4">InboxTales Review Generator</h1>
+            <p class="lead">Generate authentic reviews for your business experience with InboxTales</p>
+        </div>
+    </div>
+
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="about-section mb-4">
+                    <h2>About InboxTales</h2>
+                    <p>We are a digital agency specializing in:</p>
+                    <ul class="services-list">
+                        <li>Web & App Development</li>
+                        <li>Graphic Design</li>
+                        <li>Cybersecurity</li>
+                        <li>WhatsApp Marketing</li>
+                        <li>Social Media Marketing</li>
+                        <li>Lead Generation</li>
+                    </ul>
+                    <p>Our process includes discovery, design, development, and continuous optimization to help businesses grow through customized strategies and solutions.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="review-form">
+                    <h3 class="mb-4">Generate Your Review</h3>
+                    <form id="reviewForm">
+                        <div class="mb-3">
+                            <label for="businessName" class="form-label">Your Name or Business Name</label>
+                            <input type="text" class="form-control" id="businessName" required>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Rating</label>
+                            <select class="form-select" id="rating" required>
+                                <option value="5">5 Stars ⭐⭐⭐⭐⭐</option>
+                                <option value="4">4 Stars ⭐⭐⭐⭐</option>
+                                <option value="3">3 Stars ⭐⭐⭐</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Generate Review</button>
+                    </form>
+                    <div class="loading mt-3 text-center">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2">Generating your review...</p>
+                    </div>
+                    <div class="generated-review mt-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('reviewForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const businessName = document.getElementById('businessName').value;
+            const rating = document.getElementById('rating').value;
+            const loadingDiv = document.querySelector('.loading');
+            const reviewDiv = document.querySelector('.generated-review');
+            
+            loadingDiv.style.display = 'block';
+            reviewDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        business_name: businessName,
+                        rating: rating
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    reviewDiv.innerHTML = `<h4>Generated Review:</h4><p>${data.review}</p>
+                        <button class="btn btn-outline-primary mt-3" onclick="copyToClipboard()">Copy Review</button>`;
+                } else {
+                    reviewDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                reviewDiv.innerHTML = `<div class="alert alert-danger">Error generating review. Please try again.</div>`;
+            } finally {
+                loadingDiv.style.display = 'none';
+                reviewDiv.style.display = 'block';
+            }
+        });
+
+        function copyToClipboard() {
+            const reviewText = document.querySelector('.generated-review p').textContent;
+            navigator.clipboard.writeText(reviewText)
+                .then(() => alert('Review copied to clipboard!'))
+                .catch(err => console.error('Failed to copy text: ', err));
+        }
+    </script>
+</body>
+</html> 
