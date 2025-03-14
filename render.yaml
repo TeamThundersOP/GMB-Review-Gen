@@ -1,9 +1,12 @@
 services:
   - type: web
-    name: inboxtales-review-generator
+    name: gmb-review-gen
     env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
     startCommand: gunicorn app:app
     envVars:
       - key: PYTHON_VERSION
-        value: 3.9.0 
+        value: 3.9.0
+      - key: PORT
+        value: 8000 
