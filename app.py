@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-import requests
+import random
 import os
 from dotenv import load_dotenv
 
@@ -7,51 +7,48 @@ app = Flask(__name__)
 load_dotenv()
 
 def generate_review(business_name, rating):
-    keywords = ["digital marketing", "web development", "app development", "social media", "WhatsApp marketing", 
-                "digital agency in Mumbai", "best digital agency", "professional", "reliable"]
+    # Templates for different parts of the review
+    intros = [
+        "Highly impressed with InboxTales' {service}.",
+        "Had an excellent experience with InboxTales for our {service} needs.",
+        "Working with InboxTales on our {service} project was fantastic.",
+        "Really satisfied with InboxTales' approach to {service}.",
+    ]
     
-    prompt = f"""Generate a simple, natural-sounding Google review for InboxTales digital agency from {business_name}. 
-    Requirements:
-    1. Must be exactly 3-4 short sentences
-    2. Use simple, conversational language
-    3. Include 1-2 of these keywords naturally: digital marketing, web development, app development, social media
-    4. Mention one specific positive outcome
-    5. {rating} stars out of 5
-    6. Keep it very simple and easy to read
-    7. Sound like a real customer review
+    services = [
+        "digital marketing",
+        "web development",
+        "app development",
+        "social media marketing",
+        "digital solutions",
+    ]
     
-    Example format:
-    "Great digital agency for our web development needs. The team delivered exactly what we wanted on time. Very professional and reliable service."
-    """
-
-    url = "https://www.ninjachat.ai/api/chat"
-    headers = {
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "messages": [
-            {"role": "user", "content": prompt}
-        ]
-    }
+    outcomes = [
+        "They delivered exactly what we needed on time.",
+        "The results exceeded our expectations.",
+        "Our online presence improved significantly.",
+        "The project was completed perfectly.",
+        "They helped us achieve our goals efficiently.",
+    ]
+    
+    closings = [
+        "Highly recommended for any business looking for professional service.",
+        "Would definitely work with them again.",
+        "A reliable partner for digital solutions.",
+        "Great communication throughout the project.",
+    ]
 
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=10)
-        if not response.text.strip():
-            return {"error": "Received an empty response from AI API."}
+        # Generate the review
+        intro = random.choice(intros).format(service=random.choice(services))
+        outcome = random.choice(outcomes)
+        closing = random.choice(closings)
         
-        # Clean up and simplify the response
-        review_text = response.text.strip()
-        # Remove any quotes at the start and end
-        review_text = review_text.strip('"\'')
-        # Split into sentences and take only first 4
-        sentences = [s.strip() for s in review_text.split('.') if s.strip()][:4]
-        # Rejoin with proper spacing and punctuation
-        final_review = '. '.join(sentences) + '.'
-        # Remove any double periods
-        final_review = final_review.replace('..', '.')
+        # Combine the parts
+        review = f"{intro} {outcome} {closing}"
         
-        return {"success": True, "review": final_review}
-    except requests.exceptions.RequestException as e:
+        return {"success": True, "review": review}
+    except Exception as e:
         return {"error": str(e)}
 
 @app.route('/')
