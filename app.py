@@ -7,49 +7,56 @@ app = Flask(__name__)
 load_dotenv()
 
 def generate_review(business_name, rating):
-    # Templates for different parts of the review
-    intros = [
-        "Highly impressed with InboxTales' {service}.",
-        "Had an excellent experience with InboxTales for our {service} needs.",
-        "Working with InboxTales on our {service} project was fantastic.",
-        "Really satisfied with InboxTales' approach to {service}.",
-    ]
-    
-    services = [
-        "digital marketing",
-        "web development",
-        "app development",
-        "social media marketing",
-        "digital solutions",
-    ]
-    
-    outcomes = [
-        "They delivered exactly what we needed on time.",
-        "The results exceeded our expectations.",
-        "Our online presence improved significantly.",
-        "The project was completed perfectly.",
-        "They helped us achieve our goals efficiently.",
-    ]
-    
-    closings = [
-        "Highly recommended for any business looking for professional service.",
-        "Would definitely work with them again.",
-        "A reliable partner for digital solutions.",
-        "Great communication throughout the project.",
-    ]
-
     try:
-        # Generate the review
-        intro = random.choice(intros).format(service=random.choice(services))
+        # Simple templates for reviews
+        templates = [
+            "Really impressed with InboxTales' {service}. {outcome} {closing}",
+            "Had a great experience with InboxTales for our {service} needs. {outcome} {closing}",
+            "InboxTales did an excellent job with our {service}. {outcome} {closing}",
+            "Very satisfied with InboxTales' {service} service. {outcome} {closing}"
+        ]
+
+        services = [
+            "digital marketing",
+            "web development",
+            "app development",
+            "social media marketing",
+            "digital solutions"
+        ]
+
+        outcomes = [
+            "They delivered exactly what we needed on time",
+            "The results exceeded our expectations",
+            "Our online presence improved significantly",
+            "The project was completed perfectly",
+            "They helped us achieve our goals efficiently"
+        ]
+
+        closings = [
+            "Highly recommended!",
+            "Would definitely work with them again.",
+            "A reliable partner for digital solutions.",
+            "Great communication throughout."
+        ]
+
+        # Generate review components
+        template = random.choice(templates)
+        service = random.choice(services)
         outcome = random.choice(outcomes)
         closing = random.choice(closings)
-        
-        # Combine the parts
-        review = f"{intro} {outcome} {closing}"
-        
+
+        # Format the review
+        review = template.format(
+            service=service,
+            outcome=outcome,
+            closing=closing
+        )
+
         return {"success": True, "review": review}
+
     except Exception as e:
-        return {"error": str(e)}
+        print(f"Error generating review: {str(e)}")  # Server-side logging
+        return {"success": False, "error": "Failed to generate review. Please try again."}
 
 @app.route('/')
 def home():
@@ -57,15 +64,23 @@ def home():
 
 @app.route('/generate', methods=['POST'])
 def generate():
-    data = request.json
-    business_name = data.get('business_name')
-    rating = data.get('rating')
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"success": False, "error": "No data provided"}), 400
 
-    if not business_name or not rating:
-        return jsonify({"error": "Business name and rating are required"}), 400
+        business_name = data.get('business_name', '').strip()
+        rating = data.get('rating', '5')
 
-    result = generate_review(business_name, rating)
-    return jsonify(result)
+        if not business_name:
+            return jsonify({"success": False, "error": "Business name is required"}), 400
+
+        result = generate_review(business_name, rating)
+        return jsonify(result)
+
+    except Exception as e:
+        print(f"Server error: {str(e)}")  # Server-side logging
+        return jsonify({"success": False, "error": "Server error. Please try again."}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

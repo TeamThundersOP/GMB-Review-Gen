@@ -214,10 +214,20 @@
         document.getElementById('reviewForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const businessName = document.getElementById('businessName').value;
+            const businessName = document.getElementById('businessName').value.trim();
             const rating = document.getElementById('rating').value;
             const loadingDiv = document.querySelector('.loading');
             const reviewDiv = document.querySelector('.generated-review');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'alert alert-danger';
+            
+            if (!businessName) {
+                errorDiv.textContent = 'Please enter a business name';
+                reviewDiv.innerHTML = '';
+                reviewDiv.appendChild(errorDiv);
+                reviewDiv.style.display = 'block';
+                return;
+            }
             
             loadingDiv.style.display = 'block';
             reviewDiv.style.display = 'none';
@@ -237,14 +247,28 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    document.querySelector('.review-text').textContent = data.review;
-                    reviewDiv.style.display = 'block';
-                    document.querySelector('.review-link').style.display = 'block';
+                    reviewDiv.innerHTML = `
+                        <h4 style="color: var(--primary);">Your Review:</h4>
+                        <p class="review-text">${data.review}</p>
+                        <div class="action-buttons">
+                            <button class="btn btn-outline-primary flex-grow-1" onclick="copyToClipboard()">Copy Review</button>
+                            <a href="https://g.page/r/CXQQVVVXz9KXEB0/review" target="_blank" class="btn btn-success flex-grow-1">Post on Google</a>
+                        </div>
+                        <div class="review-link">
+                            <p class="text-muted">Generate more reviews at:</p>
+                            <a href="https://gmb-review-gen.onrender.com/">gmb-review-gen.onrender.com</a>
+                        </div>
+                    `;
                 } else {
-                    reviewDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+                    errorDiv.textContent = data.error || 'Error generating review. Please try again.';
+                    reviewDiv.innerHTML = '';
+                    reviewDiv.appendChild(errorDiv);
                 }
             } catch (error) {
-                reviewDiv.innerHTML = `<div class="alert alert-danger">Error generating review. Please try again.</div>`;
+                console.error('Error:', error);
+                errorDiv.textContent = 'Network error. Please check your connection and try again.';
+                reviewDiv.innerHTML = '';
+                reviewDiv.appendChild(errorDiv);
             } finally {
                 loadingDiv.style.display = 'none';
                 reviewDiv.style.display = 'block';
@@ -257,7 +281,10 @@
                 .then(() => {
                     alert('Review copied! Click "Post on Google" to leave your review.');
                 })
-                .catch(err => console.error('Failed to copy text: ', err));
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                    alert('Failed to copy review. Please try selecting and copying manually.');
+                });
         }
     </script>
 </body>
