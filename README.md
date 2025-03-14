@@ -1,4 +1,4 @@
-# InboxTales Review Generator
+# GMB-Review-Gen
 
 A Flask web application that generates SEO-friendly Google reviews for InboxTales digital agency. The app uses AI to create authentic-sounding reviews based on user input.
 
