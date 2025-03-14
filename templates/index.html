@@ -6,99 +6,205 @@
     <title>InboxTales Review Generator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        :root {
+            --primary: #FFD700;
+            --secondary: #212121;
+            --accent: #FFC107;
+        }
+        
         body {
-            background-color: #f8f9fa;
+            background-color: var(--secondary);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .hero-section {
-            background: linear-gradient(135deg, #0062cc, #0096ff);
-            color: white;
-            padding: 4rem 0;
-            margin-bottom: 2rem;
-        }
-        .review-form {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.1);
-        }
-        .services-list {
-            list-style: none;
-            padding: 0;
-        }
-        .services-list li {
-            margin-bottom: 0.5rem;
-            padding-left: 1.5rem;
+            color: #fff;
+            min-height: 100vh;
             position: relative;
         }
-        .services-list li:before {
-            content: "✓";
-            position: absolute;
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
             left: 0;
-            color: #0096ff;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, var(--accent), transparent 60%),
+                        radial-gradient(circle at bottom left, var(--primary), transparent 60%);
+            opacity: 0.1;
+            z-index: -1;
         }
+
+        .hero-section {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero-section h1 {
+            color: var(--primary);
+            font-weight: 700;
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        .review-form {
+            background: rgba(33, 33, 33, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 215, 0, 0.1);
+        }
+
+        .form-control, .form-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+            color: #fff;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+        }
+
+        .form-control:focus, .form-select:focus {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            color: var(--secondary);
+            font-weight: 600;
+            padding: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
         .generated-review {
-            background: #f8f9fa;
+            background: rgba(33, 33, 33, 0.7);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             padding: 1.5rem;
-            border-radius: 8px;
+            border-radius: 10px;
             margin-top: 2rem;
             display: none;
+            border: 1px solid rgba(255, 215, 0, 0.1);
         }
+
+        .review-text {
+            color: #fff;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        .btn-success {
+            background: var(--accent);
+            border: none;
+            color: var(--secondary);
+        }
+
+        .btn-success:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
         .loading {
             display: none;
+            color: var(--primary);
+        }
+
+        .spinner-border {
+            color: var(--primary);
+        }
+
+        .review-link {
+            display: none;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .review-link a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .review-link a:hover {
+            color: var(--accent);
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
     <div class="hero-section">
         <div class="container">
-            <h1 class="display-4">InboxTales Review Generator</h1>
-            <p class="lead">Generate authentic reviews for your business experience with InboxTales</p>
+            <h1 class="display-4">Review Generator</h1>
+            <p class="lead">Generate authentic reviews for InboxTales</p>
         </div>
     </div>
 
     <div class="container mb-5">
-        <div class="row">
-            <div class="col-md-6">
-                <div class="about-section mb-4">
-                    <h2>About InboxTales</h2>
-                    <p>We are a digital agency specializing in:</p>
-                    <ul class="services-list">
-                        <li>Web & App Development</li>
-                        <li>Graphic Design</li>
-                        <li>Cybersecurity</li>
-                        <li>WhatsApp Marketing</li>
-                        <li>Social Media Marketing</li>
-                        <li>Lead Generation</li>
-                    </ul>
-                    <p>Our process includes discovery, design, development, and continuous optimization to help businesses grow through customized strategies and solutions.</p>
-                </div>
-            </div>
-            <div class="col-md-6">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
                 <div class="review-form">
-                    <h3 class="mb-4">Generate Your Review</h3>
+                    <h3 class="mb-4 text-center" style="color: var(--primary);">Generate Your Review</h3>
                     <form id="reviewForm">
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label for="businessName" class="form-label">Your Name or Business Name</label>
                             <input type="text" class="form-control" id="businessName" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">Rating</label>
-                            <select class="form-select" id="rating" required>
-                                <option value="5">5 Stars ⭐⭐⭐⭐⭐</option>
-                                <option value="4">4 Stars ⭐⭐⭐⭐</option>
-                                <option value="3">3 Stars ⭐⭐⭐</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Generate Review</button>
+                        <input type="hidden" id="rating" value="5">
+                        <button type="submit" class="btn btn-primary w-100">Generate 5-Star Review</button>
                     </form>
                     <div class="loading mt-3 text-center">
-                        <div class="spinner-border text-primary" role="status">
+                        <div class="spinner-border" role="status">
                             <span class="visually-hidden">Loading...</span>
                         </div>
-                        <p class="mt-2">Generating your review...</p>
+                        <p class="mt-2">Crafting your review...</p>
                     </div>
-                    <div class="generated-review mt-4"></div>
+                    <div class="generated-review">
+                        <h4 style="color: var(--primary);">Your Review:</h4>
+                        <p class="review-text"></p>
+                        <div class="action-buttons">
+                            <button class="btn btn-outline-primary flex-grow-1" onclick="copyToClipboard()">Copy Review</button>
+                            <a href="https://g.page/r/CXQQVVVXz9KXEB0/review" target="_blank" class="btn btn-success flex-grow-1">Post on Google</a>
+                        </div>
+                        <div class="review-link">
+                            <p class="text-muted">Generate more reviews at:</p>
+                            <a href="https://gmb-review-gen.onrender.com/">gmb-review-gen.onrender.com</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -131,8 +237,9 @@
                 const data = await response.json();
                 
                 if (data.success) {
-                    reviewDiv.innerHTML = `<h4>Generated Review:</h4><p>${data.review}</p>
-                        <button class="btn btn-outline-primary mt-3" onclick="copyToClipboard()">Copy Review</button>`;
+                    document.querySelector('.review-text').textContent = data.review;
+                    reviewDiv.style.display = 'block';
+                    document.querySelector('.review-link').style.display = 'block';
                 } else {
                     reviewDiv.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
                 }
@@ -145,9 +252,11 @@
         });
 
         function copyToClipboard() {
-            const reviewText = document.querySelector('.generated-review p').textContent;
+            const reviewText = document.querySelector('.review-text').textContent;
             navigator.clipboard.writeText(reviewText)
-                .then(() => alert('Review copied to clipboard!'))
+                .then(() => {
+                    alert('Review copied! Click "Post on Google" to leave your review.');
+                })
                 .catch(err => console.error('Failed to copy text: ', err));
         }
     </script>
